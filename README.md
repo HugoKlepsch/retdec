@@ -64,9 +64,64 @@ Currently, we support only Windows and Linux.
 
 ## Build and Installation
 
+### Build in Docker
+
+#### Build image
+
+Building in Docker doesn't require installation of required libraries locally.
+This is a good option for trying out retdec without setting up the whole build toolchain.
+
+To build the retdec docker image, run
+
+```
+docker build -t retdec .
+```
+
+This builds the container from the master branch of this repository.
+
+To build the container using the local copy of the repository, fully clone the repository:
+
+```
+git submodule update --init --recursive
+```
+
+Then build the container using the development Dockerfile, `Dockerfile.dev`:
+
+```
+docker build -t retdec:dev . -f Dockerfile.dev
+```
+
+#### Run container
+
+To decompile a binary, create a container to upload the binary to:
+
+```
+docker create --name retdec retdec
+```
+
+Upload the binary:
+
+```
+docker cp <file> retdec:/destination/path/of/binary
+```
+
+Run the decompiler:
+
+```
+docker run retdec decompile.sh /destination/path/of/binary
+```
+
+Copy output back to host:
+
+```
+docker cp retdec:/destination/path/of/binary.c /path/to/save/file
+```
+
+### Build and install locally
+
 This section describes a manual build and installation of RetDec.
 
-### Requirements
+#### Requirements
 
 * Linux:
   * A compiler supporting C++14
@@ -78,7 +133,7 @@ This section describes a manual build and installation of RetDec.
   * [MSYS2](http://www.msys2.org/) and some other applications. Follow RetDec's [Windows environment setup guide](https://github.com/avast-tl/retdec/wiki/Windows-Environment) to get everything you need on Windows.
   * [Active Perl](https://www.activestate.com/activeperl). It needs to be the first Perl in `PATH`, or it has to be provided to CMake using `CMAKE_PROGRAM_PATH` variable, e.g. `-DCMAKE_PROGRAM_PATH=/c/perl/bin`.
 
-### Process
+#### Process
 
 **Warning: Install the decompiler into a clean, dedicated directory. Do NOT install into `/usr`, `/usr/local`, etc. I.e. always set `-DCMAKE_INSTALL_PREFIX=<path>` to a directory you created just for the decompiler. See [issue #12](https://github.com/avast-tl/retdec/issues/12) for more details.**
 

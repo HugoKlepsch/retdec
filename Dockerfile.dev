@@ -1,0 +1,23 @@
+FROM ubuntu:bionic
+
+RUN useradd -m retdec
+WORKDIR /home/retdec
+ENV HOME /home/retdec
+
+RUN apt-get -y update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential git bc graphviz upx cmake python zlib1g-dev flex bison libtinfo-dev autoconf pkg-config m4 libtool wget
+
+COPY . retdec
+RUN chown -R retdec:retdec retdec
+
+USER retdec
+
+RUN cd retdec && \
+    ls -alh && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/home/retdec/install && \
+    make -j$(nproc) && \
+    make install
+
+ENV PATH /home/retdec/install/bin:$PATH
